@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP-STICKER</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .header {
+            background-color: #6200ea;
+            color: white;
+            padding: 16px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .profile-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin-right: 15px;
+        }
+        .profile-info {
+            text-align: left;
+            flex-grow: 1;
+        }
+        .profile-info .name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        .profile-info .balance {
+            font-size: 16px;
+            color: #666;
+        }
+        .form-container {
+            background-color: #e1f5fe;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .form-container input {
+            width: calc(100% - 50px);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #6200ea;
+            margin-right: 10px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .form-container input:focus {
+            border-color: #3700b3;
+        }
+        .copy-button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .copy-button:hover {
+            background-color: #3700b3;
+        }
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto; /* Прокрутка при переполнении */
+            margin-bottom: 20px;
+        }
+        .task-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-card .task-icon {
+            font-size: 40px;
+            color: #6200ea;
+            margin-right: 15px;
+        }
+        .task-card .task-name {
+            flex-grow: 1;
+            font-size: 15px;
+            font-weight: bolder;
+        }
+        .task-card .reward {
+            font-size: 5px;
+            left: 500px;
+            color: #666;
+        }
+        .task-button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .task-button:hover {
+            background-color: #3700b3;
+            
+        }
+        .menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        .menu-item {
+            text-align: center;
+            cursor: pointer;
+            color: #6200ea;
+            transition: transform 0.3s, color 0.3s;
+        }
+        .menu-item:hover {
+            transform: scale(1.2);
+            color: #3700b3;
+        }
+        .menu-item.active {
+            font-weight: bold;
+            color: #3700b3;
+        }
+        .menu-item .material-icons {
+            font-size: 36px;
+            transition: color 0.3s;
+        }
+        .menu-item:hover .material-icons {
+            color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="header">{{ currentPage }}</div>
+    <div class="content">
+        <div v-if="currentPage === 'Профиль'">
+            <div class="profile-card">
+                <div class="avatar" :style="{ backgroundImage: 'url(' + user.cover + ')' }"></div>
+                <div class="profile-info">
+                    <div class="name">{{ user.firstName }} {{ user.lastName }}</div>
+                    <div class="balance">Баланс: {{ user.balance }} монет</div>
+                </div>
+            </div>
+            <div class="form-container">
+                <h4>Ваша реферальная ссылка</h4>
+                <div class="balance">За реферала платим 100 монет</div>
+                <input type="text" v-model="referralLink" readonly>
+                <button class="copy-button" @click="copyLink">Копировать</button>
+            </div>
+        </div>
+        
+        <div v-if="currentPage === 'Задания'">
+            <div class="task-list">
+                <div class="task-card" v-for="task in tasks" :key="task.id">
+                    <span class="task-icon material-icons">{{ task.icon }}</span>
+                    <div class="task-name">{{ task.reward }} {{ task.name }}</div>
+                    <button class="task-button">Выполнить</button>
+                </div>
+            </div>
+            <div class="task-card">
+                <span class="task-icon material-icons">monetization_on</span>
+                <div class="task-name">Бонус за рекламу</div>
+                <button class="task-button" @click="getBonus">Получить</button>
+            </div>
+        </div>
+    </div>
+    <div class="menu">
+        <div class="menu-item" @click="setPage('Профиль')" :class="{ active: currentPage === 'Профиль' }">
+            <span class="material-icons">person</span>
+        </div>
+        <div class="menu-item" @click="setPage('Задания')" :class="{ active: currentPage === 'Задания' }">
+            <span class="material-icons">assignment</span>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script>
+        // Инициализация VK Bridge
+        vkBridge.send('VKWebAppInit');
+
+        new Vue({
+            el: '#app',
+            data: {
+                currentPage: 'Профиль', // начальная страница
+                user: {
+                    firstName: '',
+                    lastName: '',
+                    userId: '',
+                    cover: '', // URL аватарки пользователя
+                    balance: 150
+                },
+                referralLink: 'https://app-sticker.ru/ref=494048615', // пример реферальной ссылки
+                tasks: [
+                    { id: 1, name: 'монет за подписку на группу', icon: 'group', reward: 50 },
+                    { id: 2, name: 'монет за подписку на группу', icon: 'group', reward: 100 },
+                    { id: 3, name: 'монет за подписку на группу', icon: 'group', reward: 20 },
+                    { id: 4, name: 'монет за подписку на группу', icon: 'group', reward: 10 },
+                ]
+            },
+            created() {
+                // Получаем информацию о пользователе
+                this.getUserInfo();
+            },
+            methods: {
+                getUserInfo() {
+                    vkBridge.send('VKWebAppGetUserInfo').then(data => {
+                        // Обновляем данные пользователя с полученной информации
+                        this.user.firstName = data.first_name;
+                        this.user.lastName = data.last_name;
+                        this.user.userId = data.id;
+                        this.user.cover = data.photo_100; // Устанавливаем URL аватарки пользователя
+                    }).catch(error => {
+                        console.error(error);
+                        alert('Не удалось получить информацию о пользователе');
+                    });
+                },
+                copyLink() {
+                    navigator.clipboard.writeText(this.referralLink).then(() => {
+                        alert('Ссылка скопирована!');
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
