@@ -251,6 +251,9 @@
                         alert('Не удалось получить информацию о пользователе');
                     });
                 },
+                setPage(page) {
+                this.currentPage = page;
+                },
                 copyLink() {
                     navigator.clipboard.writeText(this.referralLink).then(() => {
                         alert('Ссылка скопирована!');
